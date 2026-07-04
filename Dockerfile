@@ -1,4 +1,4 @@
-# ML Services Hub — CPU-only image
+# ML Services Hub — CPU-only image with all model weights baked in
 FROM python:3.11-slim
 
 # ffmpeg: required by Whisper for mp3/m4a decoding
@@ -11,11 +11,13 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Bake all transformer weights into the image (own layer: only re-runs when
+# config.py model ids change, not on every code edit). This makes first
+# requests instant even after Space rebuilds, which wipe the runtime disk.
+COPY config.py scripts/preload_models.py ./scripts_preload/
+RUN python scripts_preload/preload_models.py && rm -rf scripts_preload
 
-# Model weights download lazily into the HF cache on first request;
-# mount a volume here to persist them across container restarts.
-VOLUME ["/root/.cache/huggingface"]
+COPY . .
 
 # 7860 = Hugging Face Spaces convention (works anywhere)
 EXPOSE 7860
@@ -25,6 +27,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s \
     CMD python -c "import urllib.request as u; u.urlopen('http://127.0.0.1:7860/healthz')"
 
 # Single worker: models are cached as module singletons; threads share them.
-# Long timeout covers first-request model downloads.
 CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "1", \
      "--threads", "4", "--timeout", "600", "app:create_app()"]
