@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.git/
+.gitignore
+uploads/
+data/
+models/*.h5
+models/*.keras
+.cache/
+.pytest_cache/
+.ruff_cache/
+*.log
+.github/

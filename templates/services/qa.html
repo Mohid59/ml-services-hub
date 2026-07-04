@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Voice Q&A{% endblock %}
+{% block content %}
+<a class="svc-back" href="{{ url_for('index') }}">← Back to Hub</a>
+<div class="svc-header">
+  <h1>Voice Question Answering</h1>
+  <p class="svc-model">Whisper ASR → DistilBERT SQuAD → gTTS speech.
+     Ask by voice (or text); answer is spoken back.</p>
+</div>
+
+<div class="panel">
+  <h2>Ask</h2>
+  <form method="post" enctype="multipart/form-data" data-run-form>
+    <label for="context">Context passage (extractive QA reads the answer from this)</label>
+    <textarea id="context" name="context">{{ default_context }}</textarea>
+    <p class="hint">Leave as-is to use the built-in context.</p>
+
+    <label for="audiofile">Audio question (.wav / .mp3 / .m4a)</label>
+    <input type="file" id="audiofile" name="audiofile" accept="audio/*">
+    <p class="hint" data-filename-for="audiofile"></p>
+
+    <label for="question">…or type the question</label>
+    <input type="text" id="question" name="question" placeholder="What is Flask?">
+
+    <button class="btn" type="submit">
+      <span class="btn-text">Answer</span><span class="spinner"></span>
+    </button>
+  </form>
+</div>
+
+{% if result %}
+<div class="panel">
+  <h2>Answer</h2>
+  {% if result.used_default_context %}
+  <p class="hint">No context provided — used the built-in default context.</p>
+  {% endif %}
+  <p class="hint">Question source: {{ result.source }}</p>
+  <label>Question</label>
+  <p>{{ result.question }}</p>
+  <label>Answer</label>
+  <p><strong>{{ result.answer }}</strong> <span class="hint">({{ result.score }}% confidence)</span></p>
+  <label>Spoken answer</label>
+  <audio controls src="data:audio/mp3;base64,{{ result.audio }}"></audio>
+</div>
+{% endif %}
+{% endblock %}

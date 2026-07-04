@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}ML Services Hub — A Catalogue of Nine{% endblock %}
+
+{% block content %}
+<section class="masthead">
+  <div class="masthead-top">
+    <span class="kicker">Applied Machine Learning — Assignment&nbsp;Nº4</span>
+    <span class="kicker">CPU · Flask · scikit-learn · Transformers</span>
+  </div>
+
+  <h1 class="masthead-title">Machine&nbsp;Learning<br><em>Services Hub</em></h1>
+
+  <div class="masthead-foot">
+    <p class="lede">A working catalogue of nine machine-learning services —
+       clustering, association-rule mining, computer vision, and
+       transformer-driven language &amp; speech. Each specimen is live.</p>
+    <span class="masthead-count">Nº<b>09</b><span>services<br>indexed</span></span>
+  </div>
+</section>
+
+{% set ns = namespace(n=0) %}
+{% for group in group_order %}
+<section class="group" style="--gi:{{ loop.index0 }}">
+  <div class="group-head">
+    <span class="group-num">{{ "%02d"|format(loop.index) }}</span>
+    <h2 class="group-title">{{ group }}</h2>
+    <span class="group-rule"></span>
+    <span class="group-count">{{ grouped[group]|length }} entr{{ 'y' if grouped[group]|length == 1 else 'ies' }}</span>
+  </div>
+
+  <div class="entries">
+    {% for svc in grouped[group] %}
+    {% set ns.n = ns.n + 1 %}
+    <a class="entry" href="{{ url_for(svc.slug + '.page') }}"
+       style="--d:{{ ns.n }}">
+      <span class="entry-no">{{ "%02d"|format(ns.n) }}</span>
+      <span class="entry-body">
+        <h3 class="entry-name">{{ svc.name }}</h3>
+        <p class="entry-desc">{{ svc.desc }}</p>
+      </span>
+      <span class="entry-open">Open<span class="entry-arrow">⟶</span></span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,32 @@
+# Virtual envs
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# App runtime artifacts
+uploads/
+models/*.h5
+models/*.keras
+*.log
+
+# Training data (downloaded via services/prepare_gender_data.py)
+data/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+
+# HF / torch caches (if redirected into project)
+.cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

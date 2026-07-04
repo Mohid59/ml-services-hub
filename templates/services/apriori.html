@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Apriori Rules{% endblock %}
+{% block content %}
+<a class="svc-back" href="{{ url_for('index') }}">← Back to Hub</a>
+<div class="svc-header">
+  <h1>Apriori Association Rules</h1>
+  <p class="svc-model">Model: mlxtend <code>apriori</code> + <code>association_rules</code>.
+     Accepts transactional baskets or one-hot CSVs (auto-detected).</p>
+</div>
+
+<div class="panel">
+  <h2>Mine rules</h2>
+  <form method="post" enctype="multipart/form-data" data-run-form>
+    <label for="csvfile">CSV file (baskets or one-hot)</label>
+    <input type="file" id="csvfile" name="csvfile" accept=".csv">
+    <p class="hint" data-filename-for="csvfile"></p>
+
+    <div class="row">
+      <div>
+        <label for="min_support">min_support</label>
+        <input type="number" step="0.01" min="0.01" max="1" id="min_support"
+               name="min_support" value="{{ result.min_support if result else 0.05 }}">
+      </div>
+      <div>
+        <label for="min_confidence">min_confidence</label>
+        <input type="number" step="0.05" min="0.01" max="1" id="min_confidence"
+               name="min_confidence" value="{{ result.min_confidence if result else 0.5 }}">
+      </div>
+    </div>
+
+    <label style="font-weight:500;margin-top:14px;">
+      <input type="checkbox" name="use_sample" value="1"> Use bundled sample
+      (<code>transactions_sample.csv</code>) instead of an upload
+    </label>
+
+    <button class="btn" type="submit">
+      <span class="btn-text">Run Apriori</span><span class="spinner"></span>
+    </button>
+  </form>
+</div>
+
+{% if meta and not result %}
+<div class="panel">
+  <p class="hint">Detected <strong>{{ meta.shape }}</strong> data,
+     {{ meta.n_tx }} transactions. See message above.</p>
+</div>
+{% endif %}
+
+{% if result %}
+<div class="panel">
+  <h2>Rules <span class="hint">(sorted by lift)</span></h2>
+  <div class="metrics">
+    <div class="metric"><div class="val">{{ result.n_rules }}</div><div class="lbl">rules</div></div>
+    <div class="metric"><div class="val">{{ result.n_tx }}</div><div class="lbl">transactions</div></div>
+    <div class="metric"><div class="val">{{ result.n_items }}</div><div class="lbl">distinct items</div></div>
+    <div class="metric"><div class="val">{{ result.shape }}</div><div class="lbl">input type</div></div>
+  </div>
+
+  <table class="data">
+    <thead><tr>
+      <th>Antecedents</th><th>Consequents</th>
+      <th>Support</th><th>Confidence</th><th>Lift</th>
+    </tr></thead>
+    <tbody>
+      {% for r in result.table %}
+      <tr>
+        <td>{{ r.antecedents }}</td>
+        <td>{{ r.consequents }}</td>
+        <td>{{ r.support }}</td>
+        <td>{{ r.confidence }}</td>
+        <td>{{ r.lift }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

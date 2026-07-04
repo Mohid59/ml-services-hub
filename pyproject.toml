@@ -1,0 +1,23 @@
+[project]
+name = "ml-services-hub"
+version = "1.0.0"
+description = "Flask hub exposing 9 machine-learning services (clustering, rules, CV, NLP, speech)"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: tests that load transformer/CNN models (downloads on first run)",
+]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = ["data", "models", "uploads", "venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E402",  # deferred sys.path imports in scripts/tests are intentional
+]

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ML Services Hub{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand-glyph">◐</span>
+      <span class="brand-name">ML&nbsp;Services&nbsp;Hub</span>
+    </a>
+    <nav class="topnav">
+      <span class="topnav-meta">EST. ASSIGNMENT Nº4</span>
+      <a class="topnav-link" href="{{ url_for('index') }}">Index</a>
+    </nav>
+  </header>
+
+  <div class="flash-area">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          <span class="flash-tag">{{ category }}</span>{{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>ML Services Hub</span>
+    <span class="footer-rule"></span>
+    <span>Applied Machine Learning · Catalogue of Nine Services</span>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

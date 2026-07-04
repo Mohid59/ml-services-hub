@@ -1,0 +1,5 @@
+# Development / training extras
+-r requirements.txt
+pytest==8.3.2
+ruff==0.6.3
+datasets==5.0.0        # streams UTKFace for gender-CNN training

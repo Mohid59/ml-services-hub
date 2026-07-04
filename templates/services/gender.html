@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Gender Classifier{% endblock %}
+{% block content %}
+<a class="svc-back" href="{{ url_for('index') }}">← Back to Hub</a>
+<div class="svc-header">
+  <h1>Gender Image Classifier</h1>
+  <p class="svc-model">Model: Keras CNN (64×64 RGB). Falls back to an untrained
+     MobileNetV2 head if <code>models/gender_cnn.h5</code> is absent.</p>
+</div>
+
+<div class="panel">
+  <h2>Upload a face image</h2>
+  <form method="post" enctype="multipart/form-data" data-run-form>
+    <label for="imagefile">Image (.jpg / .png)</label>
+    <input type="file" id="imagefile" name="imagefile" accept="image/*">
+    <p class="hint" data-filename-for="imagefile"></p>
+    <img data-preview-for="imagefile" class="preview-img" style="display:none" alt="preview">
+    <button class="btn" type="submit">
+      <span class="btn-text">Classify</span><span class="spinner"></span>
+    </button>
+  </form>
+</div>
+
+{% if result %}
+<div class="panel">
+  <h2>Prediction</h2>
+  {% if result.fallback %}
+  <div class="flash flash-info" style="margin-top:0;">
+    Using the <strong>untrained MobileNetV2 fallback</strong> — this prediction
+    is a placeholder. Train a real model (see README) for meaningful results.
+  </div>
+  {% endif %}
+  <img class="preview-img" src="{{ url_for('gender.uploaded', name=result.filename) }}" alt="uploaded">
+  <div class="metrics" style="margin-top:16px;">
+    <div class="metric"><div class="val">{{ result.label }}</div><div class="lbl">predicted</div></div>
+    <div class="metric"><div class="val">{{ result.confidence }}%</div><div class="lbl">confidence</div></div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

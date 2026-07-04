@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Named Entity Recognition{% endblock %}
+{% block content %}
+<a class="svc-back" href="{{ url_for('index') }}">← Back to Hub</a>
+<div class="svc-header">
+  <h1>Named Entity Recognition</h1>
+  <p class="svc-model">Model: <code>dslim/bert-base-NER</code>
+     (aggregation_strategy="simple"). Colors: PER, ORG, LOC, MISC.</p>
+</div>
+
+<div class="panel">
+  <h2>Text</h2>
+  <form method="post" data-run-form>
+    <label for="text">Enter text</label>
+    <textarea id="text" name="text">{{ default_text }}</textarea>
+    <button class="btn" type="submit">
+      <span class="btn-text">Find Entities</span><span class="spinner"></span>
+    </button>
+  </form>
+</div>
+
+{% if result %}
+<div class="panel">
+  <h2>Highlighted ({{ result.n }} entities)</h2>
+  <p class="ner-text">
+    {%- for s in result.spans -%}
+      {%- if s.type -%}
+        <span class="ent ent-{{ s.type }}">{{ s.text }}<span class="ent-tag">{{ s.type }}</span></span>
+      {%- else -%}
+        {{ s.text }}
+      {%- endif -%}
+    {%- endfor -%}
+  </p>
+
+  <table class="data">
+    <thead><tr><th>Entity</th><th>Type</th><th>Confidence</th></tr></thead>
+    <tbody>
+      {% for e in result.entities %}
+      <tr><td>{{ e.word }}</td><td>{{ e.entity_group }}</td><td>{{ e.score }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

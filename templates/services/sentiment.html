@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Voice Sentiment{% endblock %}
+{% block content %}
+<a class="svc-back" href="{{ url_for('index') }}">← Back to Hub</a>
+<div class="svc-header">
+  <h1>Voice Sentiment Analysis</h1>
+  <p class="svc-model">Whisper ASR (<code>{{ "openai/whisper-base" }}</code>) →
+     DistilBERT SST-2 sentiment. Upload audio, or type text as a fallback.</p>
+</div>
+
+<div class="panel">
+  <h2>Input</h2>
+  <form method="post" enctype="multipart/form-data" data-run-form>
+    <label for="audiofile">Audio clip (.wav / .mp3 / .m4a)</label>
+    <input type="file" id="audiofile" name="audiofile" accept="audio/*">
+    <p class="hint" data-filename-for="audiofile"></p>
+
+    <label for="text">…or type text instead</label>
+    <textarea id="text" name="text" placeholder="I absolutely loved this movie!"></textarea>
+
+    <button class="btn" type="submit">
+      <span class="btn-text">Analyze</span><span class="spinner"></span>
+    </button>
+  </form>
+</div>
+
+{% if result %}
+<div class="panel">
+  <h2>Result</h2>
+  <p class="hint">Source: {{ result.source }}</p>
+  <label>Transcript / text</label>
+  <p>{{ result.transcript }}</p>
+  <div class="metrics">
+    <div class="metric"><div class="val">{{ result.label }}</div><div class="lbl">sentiment</div></div>
+    <div class="metric"><div class="val">{{ result.score }}%</div><div class="lbl">confidence</div></div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
