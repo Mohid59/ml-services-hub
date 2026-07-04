@@ -17,10 +17,14 @@ COPY . .
 # mount a volume here to persist them across container restarts.
 VOLUME ["/root/.cache/huggingface"]
 
-EXPOSE 5000
+# 7860 = Hugging Face Spaces convention (works anywhere)
+EXPOSE 7860
 ENV FLASK_ENV=production PYTHONUNBUFFERED=1
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
-    CMD python -c "import urllib.request as u; u.urlopen('http://127.0.0.1:5000/healthz')"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s \
+    CMD python -c "import urllib.request as u; u.urlopen('http://127.0.0.1:7860/healthz')"
 
-CMD ["python", "app.py"]
+# Single worker: models are cached as module singletons; threads share them.
+# Long timeout covers first-request model downloads.
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "1", \
+     "--threads", "4", "--timeout", "600", "app:create_app()"]

@@ -1,3 +1,15 @@
+---
+title: ML Services Hub
+emoji: 🧪
+colorFrom: red
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+short_description: 9 ML services behind one Flask UI
+---
+
 # ML Services Hub
 
 ![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)

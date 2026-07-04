@@ -14,6 +14,8 @@ uploads/
 models/*.h5
 models/*.keras
 *.log
+# ship the trained gender model so the live demo uses real weights (8 MB)
+!models/gender_cnn.h5
 
 # Training data (downloaded via services/prepare_gender_data.py)
 data/
