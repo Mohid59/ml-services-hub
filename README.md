@@ -12,6 +12,9 @@ short_description: 9 ML services behind one Flask UI
 
 # ML Services Hub
 
+**🔴 Live demo: [mohid59-ml-services-hub.hf.space](https://mohid59-ml-services-hub.hf.space)** · hosted on [Hugging Face Spaces](https://huggingface.co/spaces/Mohid59/ml-services-hub)
+
+[![Live Demo](https://img.shields.io/badge/🤗%20Spaces-Live_Demo-yellow)](https://huggingface.co/spaces/Mohid59/ml-services-hub)
 ![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.x-000000?logo=flask)
