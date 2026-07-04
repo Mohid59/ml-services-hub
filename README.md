@@ -97,6 +97,7 @@ the prediction as a placeholder** — the demo never breaks, and never lies.
 | Input | 64×64 RGB, rescaled 1/255, flip/rotate/zoom augmentation |
 | Architecture | Conv32-Conv64-Conv128 (each + MaxPool) → Dropout 0.4 → Dense 128 → sigmoid |
 | Split | 90% train / 10% val, label order pinned `["female", "male"]` |
+| Result | **85–86% val accuracy** after 12 epochs (~4 min CPU); 83.8% re-measured end-to-end through the web service's own preprocessing on 240 held-out faces |
 | Intended use | Course demo of an end-to-end CV pipeline. Binary labels reflect the dataset's annotations; not suitable for production identity decisions. |
 
 ## Tests & quality
