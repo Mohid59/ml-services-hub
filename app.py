@@ -65,8 +65,18 @@ def create_app():
 
     @app.route("/healthz")
     def healthz():
-        """Liveness probe for containers/orchestrators."""
-        return jsonify(status="ok", services=len(SERVICES))
+        """Liveness probe for containers/orchestrators.
+
+        Also reports whether the trained gender model shipped - a missing
+        file silently degrades that service to an untrained fallback, so
+        surface it where a deploy check will see it.
+        """
+        import os
+
+        import config as cfg
+        return jsonify(status="ok", services=len(SERVICES),
+                       gender_model="trained" if os.path.exists(cfg.GENDER_CNN_PATH)
+                       else "fallback")
 
     @app.route("/")
     def index():

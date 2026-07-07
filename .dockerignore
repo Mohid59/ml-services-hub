@@ -6,8 +6,9 @@ __pycache__/
 .gitignore
 uploads/
 data/
-models/*.h5
 models/*.keras
+# NOTE: gender_cnn.h5 is intentionally NOT ignored - the image must ship the
+# trained weights or the service silently degrades to the untrained fallback.
 .cache/
 .pytest_cache/
 .ruff_cache/
