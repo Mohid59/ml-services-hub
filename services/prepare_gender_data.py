@@ -15,10 +15,6 @@ Then train:
 """
 import argparse
 import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import config  # noqa: E402
 
 
 def main() -> None:
@@ -27,6 +23,9 @@ def main() -> None:
                         help="images per gender class (default 2400)")
     parser.add_argument("--out", default="data", help="output root dir")
     parser.add_argument("--val-frac", type=float, default=0.1)
+    parser.add_argument("--img-size", type=int, default=128,
+                        help="saved image side; train-time generators can "
+                             "downscale but never gain detail (default 128)")
     args = parser.parse_args()
 
     from datasets import load_dataset
@@ -46,7 +45,7 @@ def main() -> None:
     ds = ds.shuffle(seed=42, buffer_size=4000)
 
     counts = {"female": 0, "male": 0}
-    size = config.GENDER_IMG_SIZE
+    size = (args.img_size, args.img_size)
     for ex in ds:
         gender = str(ex["gender"]).strip().lower()
         if gender not in counts or counts[gender] >= per_class:

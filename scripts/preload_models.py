@@ -8,9 +8,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import config  # noqa: E402
-
 from huggingface_hub import snapshot_download  # noqa: E402
+
+import config  # noqa: E402
 
 MODELS = [
     config.WHISPER_MODEL,

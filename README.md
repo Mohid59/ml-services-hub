@@ -96,8 +96,11 @@ pip install -r requirements-dev.txt
 # 1. Stream a balanced UTKFace subset from the HF Hub (no 1 GB download)
 python services/prepare_gender_data.py --per-class 2400
 
-# 2. Train the CNN (3×Conv/MaxPool → Dense → sigmoid, augmentation, 64×64 RGB)
-python services/train_gender_cnn.py --data data --epochs 12
+# 2. Train (scratch CNN or MobileNetV2 transfer learning - see ablation below)
+python services/train_gender_cnn.py --arch scratch --img-size 96 --epochs 16
+
+# 3. Audit fairness on faces the model never saw (prints the model-card table)
+python services/evaluate_fairness.py
 ```
 
 This writes `models/gender_cnn.h5`, which the web service auto-loads on the next request.
@@ -108,12 +111,50 @@ the prediction as a placeholder** — the demo never breaks, and never lies.
 
 | | |
 |---|---|
-| Data | UTKFace via `nu-delta/utkface` (HF Hub), shuffled stream, 2,400/class |
-| Input | 64×64 RGB, rescaled 1/255, flip/rotate/zoom augmentation |
+| Data | UTKFace via `nu-delta/utkface` (HF Hub), shuffled stream, 2,400/class, saved at 128px |
+| Input | 96×96 RGB, rescaled 1/255, flip/rotate/zoom augmentation |
 | Architecture | Conv32-Conv64-Conv128 (each + MaxPool) → Dropout 0.4 → Dense 128 → sigmoid |
 | Split | 90% train / 10% val, label order pinned `["female", "male"]` |
-| Result | **85–86% val accuracy** after 12 epochs (~4 min CPU); 83.8% re-measured end-to-end through the web service's own preprocessing on 240 held-out faces |
-| Intended use | Course demo of an end-to-end CV pipeline. Binary labels reflect the dataset's annotations; not suitable for production identity decisions. |
+| Training | early stopping (best-weights restore) + ReduceLROnPlateau |
+| Result | **87.3% val accuracy**; **83.5%** on 600 truly-unseen faces (fairness audit below) |
+
+**Ablation** (same data, same budget — measured, not assumed):
+
+| Config | Val accuracy |
+|---|---|
+| Scratch CNN @ 64px | 85.4% |
+| MobileNetV2 transfer @ 96px (frozen base + fine-tune) | 82.5% |
+| **Scratch CNN @ 96px** (shipped) | **87.3%** |
+
+Transfer learning *underperformed* here: with only 4.3k training images the
+fine-tuning phase degraded validation accuracy (the classic Keras
+BatchNorm-unfreeze pitfall plus over-parameterization at this data scale).
+Both paths are reproducible via `--arch scratch|mobilenet`.
+
+**Fairness audit** — accuracy by demographic on 600 faces the model never saw
+(`python services/evaluate_fairness.py`; audit skips the exact training pool
+deterministically):
+
+| Group | n | Accuracy |
+|---|---|---|
+| female (all) | 300 | **83.7%** |
+| male (all) | 300 | **83.3%** |
+| Asian (both genders) | 116 | ~72% |
+| Black (both genders) | 97 | 88–93% |
+| White (both genders) | 254 | 85–91% |
+| Indian female / male | 40 / 51 | 92.5% / 72.5% |
+| **overall** | 600 | **83.5%** |
+
+Accuracy is gender-balanced but **not ethnicity-balanced**: Asian faces trail
+by ~11 points (UTKFace's Asian subset skews strongly toward infants and
+children, whose gender presentation is genuinely harder — a data distribution
+issue the audit surfaces rather than hides).
+
+**Limitations & intended use.** Course demo of an end-to-end CV pipeline.
+Binary labels come from the dataset's annotations and don't capture gender
+identity; demographic performance gaps above are real. Not suitable for any
+production or identity-related decision. Improving the weakest slices
+(age-stratified sampling, per-group reweighting) is the documented next step.
 
 ## Tests & quality
 

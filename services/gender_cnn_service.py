@@ -58,10 +58,23 @@ def _get_model():
     return _model
 
 
-def _preprocess(path):
-    """Load image -> (1, H, W, 3) float array scaled to [0, 1]."""
+def _input_size(model):
+    """Read (W, H) the model expects; falls back to the config default."""
+    shape = getattr(model, "input_shape", None)
+    if shape and len(shape) == 4 and shape[1] and shape[2]:
+        return (shape[2], shape[1])  # PIL wants (width, height)
+    return config.GENDER_IMG_SIZE
+
+
+def _preprocess(path, model=None):
+    """Load image -> (1, H, W, 3) float array scaled to [0, 1].
+
+    Input size is derived from the loaded model, so retraining at a
+    different --img-size needs no code change here.
+    """
     from PIL import Image
-    img = Image.open(path).convert("RGB").resize(config.GENDER_IMG_SIZE)
+    size = _input_size(model) if model is not None else config.GENDER_IMG_SIZE
+    img = Image.open(path).convert("RGB").resize(size)
     arr = np.asarray(img, dtype="float32") / 255.0
     return np.expand_dims(arr, axis=0)
 
@@ -85,7 +98,7 @@ def page():
 
     try:
         model = _get_model()
-        x = _preprocess(path)
+        x = _preprocess(path, model)
         preds = model.predict(x, verbose=0)[0]
         # Handle both 2-unit softmax and single-unit sigmoid heads.
         if preds.shape[-1] == 1:
